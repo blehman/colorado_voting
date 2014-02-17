@@ -1,3 +1,3 @@
 colorado_voting
 ===============
-Goal: investigate voting on education and pot issues.
+Goal: investigate voting on education taxes and pot legalization.
