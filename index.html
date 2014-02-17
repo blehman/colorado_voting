@@ -5,15 +5,7 @@
 </head>
 <body>
 
-<script>
-  var numericFields = ["Ballots Cast", "No", "Registered Voters", "Total Turnout", "Yes"];
-  d3.csv("data/amendment64.csv", function(data) {
-    data.forEach(function(d) {
-      numericFields.forEach(function(f) {
-        d[f] = +d[f];
-      });
-    });
-    console.log(data);
-  });
-</script>
+<div id="vis"></div>
+
+<script src="js/vis.js"></script>
 </body>
