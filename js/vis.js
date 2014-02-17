@@ -33,9 +33,10 @@
       .range([0,350]);
 
     points.attr("transform", "translate(" + [w/2,h/2] + ")");
-    points.selectAll("point").data(data)
+    points.selectAll(".point").data(data)
       .enter()
       .append("circle")
+      .classed("point", true)
       .attr({
         transform: function(d,i) { 
           console.log(d);
