@@ -1,0 +1,19 @@
+<html>
+<head>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <title>Vote Similarity</title>
+</head>
+<body>
+
+<script>
+  var numericFields = ["Ballots Cast", "No", "Registered Voters", "Total Turnout", "Yes"];
+  d3.csv("amendment64.csv", function(data) {
+    data.forEach(function(d) {
+      numericFields.forEach(function(f) {
+        d[f] = +d[f];
+      });
+    });
+    console.log(data);
+  });
+</script>
+</body>
