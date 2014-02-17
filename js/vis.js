@@ -17,6 +17,16 @@
       height: h
     });
 
+    points.selectAll(".marker").data(d3.range(4))
+      .enter()
+      .append("circle")
+      .classed("marker", true)
+      .attr({
+        cx: 0,
+        cy: 0,
+        r: function(d,i) { return i * 100; }
+      });
+
     angle.rangePoints([0,360]).domain(d3.range(data.length));
     console.log(angle(1), angle(2), angle(3));
     rad.domain([0,d3.max(data, function(d) { return d["Yes"];})])
@@ -33,7 +43,7 @@
         },
         cx: 0,
         cy: 0,
-        r: 10
+        r:  6
       });
   }
 
