@@ -37,6 +37,8 @@
       .enter()
       .append("circle")
       .classed("point", true)
+      .transition()
+      .delay(function(d,i) { return i * 10;})
       .attr({
         transform: function(d,i) { 
           console.log(d);
