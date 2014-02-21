@@ -13,7 +13,9 @@
         angle = d3.scale.ordinal(),
         rad = d3.scale.linear(),
         size = d3.scale.linear(),
-        points = svg.append("g").classed("points", true),
+        container = svg.select(".container"),
+        points = container.select(".points"),
+        markers = container.select(".markers"),
         menuCounty = d3.select("#menu").property("value"),
         selected = data.filter(function(d) { 
           return d.county == menuCounty; })[0];
@@ -34,7 +36,8 @@
  // Update header text.
     d3.select("h3").text("Similarity to " + selected.county);
 
-    points.selectAll(".marker").data(d3.range(4))
+    container.attr("transform", "translate(" + [w/2,h/2] + ")");
+    markers.selectAll(".marker").data(d3.range(4))
       .enter()
       .append("circle")
       .classed("marker", true)
@@ -44,10 +47,10 @@
         r: function(d,i) { return (i+1) * 100; }
       });
 
-    points.attr("transform", "translate(" + [w/2,h/2] + ")");
     var dots = points.selectAll(".point")
-      .data(data, function(d) { return d.county;})
-      .enter()
+      .data(data, function(d) { return d.county; });
+
+    dots.enter()
       .append("circle")
       .classed("point", true)
       .attr({
@@ -73,6 +76,10 @@ svg.attr({
   width:  w,
   height: h
 });
+
+var container = svg.append("g").classed("container", true);
+container.append("g").classed("markers", true);
+container.append("g").classed("points", true);
 
 d3.csv("data/amendment64.csv", function(data) { 
   buildMenu(data); 
