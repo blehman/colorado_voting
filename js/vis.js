@@ -68,6 +68,7 @@
 
 var svg = d3.select("svg"),
       w = 800, h = 800;
+
 svg.attr({
   width:  w,
   height: h
