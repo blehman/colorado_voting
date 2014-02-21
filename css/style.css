@@ -9,5 +9,6 @@ body {
 }
 
 .point {
-  fill: #666;
+  stroke: #fff;
+  opacity: 0.8;
 }

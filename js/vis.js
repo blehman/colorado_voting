@@ -13,6 +13,7 @@
         angle = d3.scale.ordinal(),
         rad = d3.scale.linear(),
         size = d3.scale.linear(),
+        color = d3.scale.linear(),
         container = svg.select(".container"),
         points = container.select(".points"),
         markers = container.select(".markers"),
@@ -31,7 +32,9 @@
     rad.domain([0,d3.max(data, function(d) { return d.difference;})])
       .range([0,350]);
     size.domain([0,d3.max(data, function(d) { return d.difference;})])
-      .range([3,13]);
+      .range([13,3]);
+    color.domain([0,d3.max(data, function(d) { return d.difference;})])
+      .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl);
 
  // Update header text.
     d3.select("h3").text("Similarity to " + selected.county);
@@ -60,7 +63,7 @@
       });
 
     dots.on("mouseover", function(ev) { 
-      console.log(ev.county);
+
     });
 
     dots.on("click", function(ev) { 
@@ -74,7 +77,8 @@
         transform: function(d,i) { 
           return "rotate(" + angle(i) + ") translate(" + rad(d.difference) + ")";
         },
-        r: function(d, i) { return size(d.difference); }
+        r: function(d, i) { return size(d.difference); },
+        fill: function(d) { return color(d.difference); }
       });
   }
 
