@@ -59,6 +59,15 @@
         r:  3
       });
 
+    dots.on("mouseover", function(ev) { 
+      console.log(ev.county);
+    });
+
+    dots.on("click", function(ev) { 
+      d3.select("#menu").property("value", ev.county);
+      drawRadial(data);
+    });
+
     dots.transition()
       .delay(function(d,i) { return i * 10;})
       .attr({
