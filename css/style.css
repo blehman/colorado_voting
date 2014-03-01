@@ -1,0 +1,14 @@
+body {
+  font-family: Sans-Serif;
+}
+
+.marker { 
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+
+.point {
+  stroke: #fff;
+  opacity: 0.8;
+}
