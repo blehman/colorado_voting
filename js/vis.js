@@ -18,9 +18,9 @@
         points = container.select(".points"),
         markers = container.select(".markers"),
         menuCounty = d3.select("#menu").property("value"),
-        selected = data.filter(function(d) { 
+        selected = data.filter(function(d) {
           return d.county == menuCounty; })[0];
-    
+
     data.forEach(function(d) {
       numericFields.forEach(function(f) {
         d[f] = +d[f];
@@ -39,7 +39,7 @@
  // Update header text.
     d3.select("h3").text("Similarity to " + selected.county);
 
-    container.attr("transform", "translate(" + [w/2,h/2] + ")");
+    container.attr("transform", "translate(" + [circleWidth/2,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
       .enter()
       .append("circle")
@@ -47,7 +47,7 @@
       .attr({
         cx: 0,
         cy: 0,
-        r: function(d,i) { return (i+1) * 100; }
+        r: function(d,i) { return (i+1) * circleWidth / 8; }
       });
 
     var dots = points.selectAll(".point")
@@ -62,11 +62,11 @@
         r:  3
       });
 
-    dots.on("mouseover", function(ev) { 
+    dots.on("mouseover", function(ev) {
 
     });
 
-    dots.on("click", function(ev) { 
+    dots.on("click", function(ev) {
       d3.select("#menu").property("value", ev.county);
       drawRadial(data);
     });
@@ -74,7 +74,7 @@
     dots.transition()
       .delay(function(d,i) { return i * 10;})
       .attr({
-        transform: function(d,i) { 
+        transform: function(d,i) {
           return "rotate(" + angle(i) + ") translate(" + rad(d.difference) + ")";
         },
         r: function(d, i) { return size(d.difference); },
@@ -83,7 +83,7 @@
   }
 
 var svg = d3.select("svg"),
-      w = 800, h = 800;
+      w = 960, h = 600, circleWidth = 600;
 
 svg.attr({
   width:  w,
@@ -94,7 +94,7 @@ var container = svg.append("g").classed("container", true);
 container.append("g").classed("markers", true);
 container.append("g").classed("points", true);
 
-d3.csv("data/amendment64.csv", function(data) { 
-  buildMenu(data); 
+d3.csv("data/amendment64.csv", function(data) {
+  buildMenu(data);
   drawRadial(data);
 });
