@@ -30,7 +30,7 @@
 
     angle.rangePoints([0,360]).domain(d3.range(data.length));
     rad.domain([0,d3.max(data, function(d) { return d.difference;})])
-      .range([0,350]);
+      .range([0,circleWidth/2]);
     size.domain([0,d3.max(data, function(d) { return d.difference;})])
       .range([13,3]);
     color.domain([0,d3.max(data, function(d) { return d.difference;})])
