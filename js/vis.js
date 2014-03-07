@@ -29,11 +29,11 @@
     });
       var max_diff = d3.max(data, function(d) { return d.difference;})
     angle.rangePoints([0,360]).domain(d3.range(data.length));
-    rad.domain([0,])
+    rad.domain([0,max_diff])
       .range([0,circleWidth/2]);
-    size.domain([0,max_diff)
+    size.domain([0,max_diff])
       .range([13,3]);
-    color.domain([0,max_diff)
+    color.domain([0,max_diff])
       .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl);
 
  // Update header text.
