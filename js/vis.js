@@ -27,13 +27,13 @@
       });
       d.difference = Math.abs((+selected.yes / +selected.turnout) - (d.yes / d.turnout));
     });
-
+      var max_diff = d3.max(data, function(d) { return d.difference;})
     angle.rangePoints([0,360]).domain(d3.range(data.length));
-    rad.domain([0,d3.max(data, function(d) { return d.difference;})])
+    rad.domain([0,])
       .range([0,circleWidth/2]);
-    size.domain([0,d3.max(data, function(d) { return d.difference;})])
+    size.domain([0,max_diff)
       .range([13,3]);
-    color.domain([0,d3.max(data, function(d) { return d.difference;})])
+    color.domain([0,max_diff)
       .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl);
 
  // Update header text.
