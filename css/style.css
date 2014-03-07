@@ -12,3 +12,8 @@ body {
   stroke: #fff;
   opacity: 0.8;
 }
+
+svg {
+    margin: 20px
+    padding: 20px
+}
