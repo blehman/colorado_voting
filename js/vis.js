@@ -16,6 +16,8 @@
         color = d3.scale.linear(),
         container = svg.select(".container"),
         points = container.select(".points"),
+        dot_selection = points.selectAll(".point"),
+        dots,
         markers = container.select(".markers"),
         menuCounty = d3.select("#menu").property("value"),
         selected = data.filter(function(d) {
@@ -34,10 +36,10 @@
     size.domain([0,max_diff])
       .range([13,3]);
     color.domain([0,max_diff])
-      .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl);
+      .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl); //consider: add multiple colors
 
  // Update header text.
-    d3.select("h3").text("Similarity to " + selected.county);
+    d3.select("body").select('#vis').select("h3").text("Similarity to " + selected.county);
 
     container.attr("transform", "translate(" + [circleWidth/2,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
@@ -50,8 +52,7 @@
         r: function(d,i) { return (i+1) * circleWidth / 8; }
       });
 
-    var dots = points.selectAll(".point")
-      .data(data, function(d) { return d.county; });
+    dots = dot_selection.data(data, function(d) { return d.county; }); //makes d3 use county instead of index to differentiate items in the array
 
     dots.enter()
       .append("circle")
