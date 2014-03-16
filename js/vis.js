@@ -5,7 +5,10 @@
       .append("option")
       .attr("value", function(d) { return d.county; })
       .text(function(d) { return d.county; });
-    menu.on("change", function(event) { drawRadial(data);});
+    menu.on("change", function(event) { 
+      shortenDetailLine();
+      drawRadial(data);
+    });
 
   }
   function drawRadial(data) {
