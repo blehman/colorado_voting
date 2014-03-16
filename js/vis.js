@@ -63,12 +63,17 @@
         r:  3
       });
 
-    dots.on("mouseover", function(ev) {
+    dots.on("mouseover", function (d,i) {
+      drawDetail(d,i,angle, rad);
+    });
 
+    dots.on("mouseout", function (d,i) {
+      shortenDetailLine();
     });
 
     dots.on("click", function(ev) {
       d3.select("#menu").property("value", ev.county);
+      shortenDetailLine();
       drawRadial(data);
     });
 
@@ -82,6 +87,24 @@
       });
   }
 
+function shortenDetailLine() {
+  line   = detail.select(".detailLine");
+  header = detail.select(".detailHeader");
+  d3.select(".detailLine").attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210");
+}
+
+function drawDetail(d, i, angle, rad) {
+  console.log(d,i);
+  var path, line, header, detail = svg.select(".detail");
+  line   = detail.select(".detailLine");
+  header = detail.select(".detailHeader");
+  header.text(d.county);
+  line.transition()
+    .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210" + 
+        " L" + (Math.sin(angle(i)) * rad(d.difference)) + "," + (Math.cos(angle(i)) * rad(d.difference))
+        );
+}
+
 var svg = d3.select("svg"),
       w = 960, h = 600, circleWidth = 600;
 
@@ -90,9 +113,15 @@ svg.attr({
   height: h
 });
 
-var container = svg.append("g").classed("container", true);
+var detail, container = svg.append("g").classed("container", true);
 container.append("g").classed("markers", true);
 container.append("g").classed("points", true);
+detail = container.append("g").classed("detail", true);
+detail.append("path").classed("detailLine", true);
+detail.append("text").classed("detailHeader", true).attr({
+  x: 300,
+  y: -220,
+});
 
 d3.csv("data/amendment64.csv", function(data) {
   buildMenu(data);
