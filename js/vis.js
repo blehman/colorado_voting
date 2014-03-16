@@ -30,7 +30,7 @@
       d.difference = Math.abs((+selected.yes / +selected.turnout) - (d.yes / d.turnout));
     });
       var max_diff = d3.max(data, function(d) { return d.difference;})
-    angle.rangePoints([0,360]).domain(d3.range(data.length));
+    angle.rangePoints([0,2 * Math.PI]).domain(d3.range(data.length));
     rad.domain([0,max_diff])
       .range([0,circleWidth/2]);
     size.domain([0,max_diff])
@@ -75,9 +75,8 @@
     dots.transition()
       .delay(function(d,i) { return i * 10;})
       .attr({
-        transform: function(d,i) {
-          return "rotate(" + angle(i) + ") translate(" + rad(d.difference) + ")";
-        },
+        cx: function(d,i) { return Math.sin(angle(i)) * rad(d.difference); },
+        cy: function(d,i) { return Math.cos(angle(i)) * rad(d.difference); },
         r: function(d, i) { return size(d.difference); },
         fill: function(d) { return color(d.difference); }
       });
