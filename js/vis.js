@@ -29,7 +29,7 @@
       });
       d.difference = Math.abs((+selected.yes / +selected.turnout) - (d.yes / d.turnout));
     });
-      var max_diff = d3.max(data, function(d) { return d.difference;})
+      var max_diff = d3.max(data, function(d) { return d.difference;});
     angle.rangePoints([0,2 * Math.PI]).domain(d3.range(data.length));
     rad.domain([0,max_diff])
       .range([0,circleWidth/2]);
@@ -68,7 +68,6 @@
     });
 
     dots.on("mouseout", function (d,i) {
-      shortenDetailLine();
     });
 
     dots.on("click", function(ev) {
@@ -90,7 +89,8 @@
 function shortenDetailLine() {
   line   = detail.select(".detailLine");
   header = detail.select(".detailHeader");
-  d3.select(".detailLine").attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210");
+  d3.select(".detailLine").transition()
+    .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210 L300,-210");
 }
 
 function drawDetail(d, i, angle, rad) {
