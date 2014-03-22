@@ -98,16 +98,16 @@ function drawText(data) {
           x: labelX,
           y: labelY
         })
-  .text(function(d,i) { return d.county;})
+  .text(function(d,i) { return d.county;});
 }
 
 
-function labelX (d,i) { if (i % 2 == 0) { return 320 } else { return 550;}}
-function labelY (d,i) { if (i % 2 == 0) { return -280 + (i * 9)} else { return -280 + (i - 1) * 9}}
+function labelX (d,i) { if (i % 2 === 0) { return 320;} else { return 550;}}
+function labelY (d,i) { if (i % 2 === 0) { return -280 + (i * 9);} else { return -280 + (i - 1) * 9;}}
 
 function shortenDetailLine() {
-  line   = detail.select(".detailLine");
-  header = detail.select(".detailHeader");
+  var line   = detail.select(".detailLine");
+  var header = detail.select(".detailHeader");
   d3.select(".detailLine").transition()
     .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210 L300,-210");
 }
