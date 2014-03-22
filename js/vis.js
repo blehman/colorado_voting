@@ -1,17 +1,5 @@
-  function buildMenu(data) {
-    var menu = d3.select("#menu");
-    menu.selectAll("option").data(data)
-      .enter()
-      .append("option")
-      .attr("value", function(d) { return d.county; })
-      .text(function(d) { return d.county; });
-    menu.on("change", function(event) { 
-      shortenDetailLine();
-      drawRadial(data);
-    });
 
-  }
-  function drawRadial(data) {
+  function drawRadial(data, selected) {
     var numericFields = ["ballots", "no", "voters", "turnout", "yes"],
         angle = d3.scale.ordinal(),
         rad = d3.scale.linear(),
@@ -20,11 +8,9 @@
         container = svg.select(".container"),
         points = container.select(".points"),
         dot_selection = points.selectAll(".point"),
+        detail = d3.select(".detail"),
         dots,
-        markers = container.select(".markers"),
-        menuCounty = d3.select("#menu").property("value"),
-        selected = data.filter(function(d) {
-          return d.county == menuCounty; })[0];
+        markers = container.select(".markers");
 
     data.forEach(function(d) {
       numericFields.forEach(function(f) {
@@ -67,16 +53,18 @@
       });
 
     dots.on("mouseover", function (d,i) {
-      drawDetail(d,i,angle, rad);
+      drawDetail(d,i);
     });
 
     dots.on("mouseout", function (d,i) {
+      d3.selectAll(".underline").remove();
     });
 
-    dots.on("click", function(ev) {
-      d3.select("#menu").property("value", ev.county);
+    dots.on("click", function(d) {
+      d3.selectAll(".underline").remove();
       shortenDetailLine();
-      drawRadial(data);
+      console.log(this);
+      drawRadial(data, d);
     });
 
     dots.transition()
@@ -89,23 +77,39 @@
       });
   }
 
+function drawDetail(d,i) {
+  var detail = d3.select(".detail");
+  var selected = detail.selectAll("text").filter(function(inner_d) { return d == inner_d;});
+  var x = selected[0][0].getAttribute("x");
+  var y = selected[0][0].getAttribute("y");
+  detail.append("path")
+    .classed("underline", true)
+    .attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength());
+}
+
+function drawText(data) {
+  detail.selectAll(".label")
+    .data(data)
+    .enter()
+    .append("text")
+    .classed("label",true)
+    .attr(
+        {
+          x: labelX,
+          y: labelY
+        })
+  .text(function(d,i) { return d.county;})
+}
+
+
+function labelX (d,i) { if (i % 2 == 0) { return 320 } else { return 550;}}
+function labelY (d,i) { if (i % 2 == 0) { return -280 + (i * 9)} else { return -280 + (i - 1) * 9}}
+
 function shortenDetailLine() {
   line   = detail.select(".detailLine");
   header = detail.select(".detailHeader");
   d3.select(".detailLine").transition()
     .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210 L300,-210");
-}
-
-function drawDetail(d, i, angle, rad) {
-  console.log(d,i);
-  var path, line, header, detail = svg.select(".detail");
-  line   = detail.select(".detailLine");
-  header = detail.select(".detailHeader");
-  header.text(d.county);
-  line.transition()
-    .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210" + 
-        " L" + (Math.sin(angle(i)) * rad(d.difference)) + "," + (Math.cos(angle(i)) * rad(d.difference))
-        );
 }
 
 var svg = d3.select("svg"),
@@ -120,13 +124,12 @@ var detail, container = svg.append("g").classed("container", true);
 container.append("g").classed("markers", true);
 container.append("g").classed("points", true);
 detail = container.append("g").classed("detail", true);
-detail.append("path").classed("detailLine", true);
 detail.append("text").classed("detailHeader", true).attr({
   x: 300,
   y: -220,
 });
 
 d3.csv("data/amendment64.csv", function(data) {
-  buildMenu(data);
-  drawRadial(data);
+  drawText(data);
+  drawRadial(data, data[0]);
 });
