@@ -36,3 +36,7 @@ svg {
   stroke: #333;
 }
 
+.left {
+  text-anchor: end;
+}
+

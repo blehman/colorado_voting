@@ -30,7 +30,7 @@
  // Update header text.
     d3.select("body").select('#vis').select("h3").text("Similarity to " + selected.county);
 
-    container.attr("transform", "translate(" + [circleWidth/2,circleWidth/2] + ")");
+    container.attr("transform", "translate(" + [circleWidth/2+x_offset,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
       .enter()
       .append("circle")
@@ -53,7 +53,7 @@
       });
 
     dots.on("mouseover", function (d,i) {
-      drawDetail(d,i);
+      drawDetail(d,i, this);
     });
 
     dots.on("mouseout", function (d,i) {
@@ -77,14 +77,19 @@
       });
   }
 
-function drawDetail(d,i) {
+function drawDetail(d,i, element) {
   var detail = d3.select(".detail");
   var selected = detail.selectAll("text").filter(function(inner_d) { return d == inner_d;});
   var x = selected[0][0].getAttribute("x");
   var y = selected[0][0].getAttribute("y");
+  var cx = element.getAttribute("cx");
+  var cy = element.getAttribute("cy");
+  var direction = i % 2 == 0 ? -1 : 1;
+  //var direction = function(d,i) { if (i % 2 === 0) { return -1;} else { return 1;}}
   detail.append("path")
     .classed("underline", true)
-    .attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength());
+    //.attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength())
+    .attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength())
 }
 
 function drawText(data) {
@@ -93,6 +98,8 @@ function drawText(data) {
     .enter()
     .append("text")
     .classed("label",true)
+    .classed("left",  function(d,i) { return i % 2 === 0 })
+    .classed("right", function(d,i) { return i % 2 !== 0 })
     .attr(
         {
           x: labelX,
@@ -102,7 +109,7 @@ function drawText(data) {
 }
 
 
-function labelX (d,i) { if (i % 2 === 0) { return 320;} else { return 550;}}
+function labelX (d,i) { if (i % 2 === 0) { return -c2-10;} else { return c2+10;}}
 function labelY (d,i) { if (i % 2 === 0) { return -280 + (i * 9);} else { return -280 + (i - 1) * 9;}}
 
 function shortenDetailLine() {
@@ -112,9 +119,10 @@ function shortenDetailLine() {
     .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210 L300,-210");
 }
 
+var x_offset=200
 var svg = d3.select("svg"),
       w = 960, h = 600, circleWidth = 600;
-
+var c2=circleWidth/2
 svg.attr({
   width:  w,
   height: h
