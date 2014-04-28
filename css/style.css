@@ -29,3 +29,14 @@ svg {
   stroke: #333;
   pointer-events: none;
 }
+
+.underLine {
+  fill: none;
+  stroke-width: 1px;
+  stroke: #333;
+}
+
+.left {
+  text-anchor: end;
+}
+
