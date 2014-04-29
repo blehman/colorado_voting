@@ -1,10 +1,10 @@
 
   function drawRadial(data, selected) {
-    var numericFields = ["ballots", "no", "voters", "turnout", "yes"],
+    var numericFields = ["Yes","No","Total","Registered_Voters","Ballots_Cast","Turnout"],
         angle = d3.scale.ordinal(),
         rad = d3.scale.linear(),
         size = d3.scale.linear(),
-        color = d3.scale.linear(),
+        color = d3.scale.threshold().range(["Crimson","IndianRed","LimeGreen","GreenYellow"]),
         container = svg.select(".container"),
         points = container.select(".points"),
         dot_selection = points.selectAll(".point"),
@@ -16,19 +16,19 @@
       numericFields.forEach(function(f) {
         d[f] = +d[f];
       });
-      d.difference = Math.abs((+selected.yes / +selected.turnout) - (d.yes / d.turnout));
+      d.difference = Math.abs((+selected.Yes / (selected.Yes +selected.No)) - (d.Yes / (d.Yes+d.No)));
     });
       var max_diff = d3.max(data, function(d) { return d.difference;});
     angle.rangePoints([0,2 * Math.PI]).domain(d3.range(data.length));
     rad.domain([0,max_diff])
       .range([0,circleWidth/2]);
-    size.domain([0,max_diff])
-      .range([13,3]);
-    color.domain([0,max_diff])
-      .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl); //consider: add multiple colors
-
+    size.domain(d3.extent(data,function (d) { return d.Avg_Registered_Voters}))
+      .range([3,13]);
+    color.domain([0.45,0.5,0.55,1])
+    //color.domain(d3.extent(data,function (d) { return d.Vote64}))
+    //   .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl); //consider: add multiple colors
  // Update header text.
-    d3.select("body").select('#vis').select("h3").text("Similarity to " + selected.county);
+    d3.select("body").select('#vis').select("h3").text("Similarity to " + selected.County);
 
     container.attr("transform", "translate(" + [circleWidth/2+x_offset,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
@@ -41,7 +41,7 @@
         r: function(d,i) { return (i+1) * circleWidth / 8; }
       });
 
-    dots = dot_selection.data(data, function(d) { return d.county; }); //makes d3 use county instead of index to differentiate items in the array
+    dots = dot_selection.data(data, function(d) { return d.County; }); //makes d3 use county instead of index to differentiate items in the array
 
     dots.enter()
       .append("circle")
@@ -63,7 +63,6 @@
     dots.on("click", function(d) {
       d3.selectAll(".underline").remove();
       shortenDetailLine();
-      console.log(this);
       drawRadial(data, d);
     });
 
@@ -72,8 +71,8 @@
       .attr({
         cx: function(d,i) { return Math.sin(angle(i)) * rad(d.difference); },
         cy: function(d,i) { return Math.cos(angle(i)) * rad(d.difference); },
-        r: function(d, i) { return size(d.difference); },
-        fill: function(d) { return color(d.difference); }
+        r: function(d, i) { return size(d.Avg_Registered_Voters); },
+        fill: function(d) { return color(d.Vote64); }
       });
   }
 
@@ -105,7 +104,7 @@ function drawText(data) {
           x: labelX,
           y: labelY
         })
-  .text(function(d,i) { return d.county;});
+  .text(function(d,i) { return d.County;});
 }
 
 
@@ -137,7 +136,17 @@ detail.append("text").classed("detailHeader", true).attr({
   y: -220,
 });
 
-d3.csv("data/amendment64.csv", function(data) {
-  drawText(data);
-  drawRadial(data, data[0]);
+d3.csv("data/amendment66_v2.csv", function(data66) {
+    d3.csv("data/amendment64_v2.csv", function(data64) {
+      data66.forEach( function(d){
+        data64.forEach( function(e) {
+            if (e.County == d.County) {
+                d.Vote64=e.Yes/e.Total
+                d.Avg_Registered_Voters=(d.Registered_Voters+e.Registered_Voters)/2
+                console.log(d.Avg_Registered_Voters)
+            }
+            })})
+      drawText(data66);
+      drawRadial(data66, data66[0]);
+    });
 });
