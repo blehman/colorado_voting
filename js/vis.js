@@ -1,5 +1,5 @@
 
-  function drawRadial(data, selected) {
+function drawRadial(data, selected) {
     var numericFields = ["Yes","No","Total","Registered_Voters","Ballots_Cast","Turnout"],
         angle = d3.scale.ordinal(),
         rad = d3.scale.linear(),
@@ -52,6 +52,15 @@
         r:  3
       });
 
+    dots.transition()
+      .delay(function(d,i) { return i * 10;})
+      .attr({
+        cx: function(d,i) { return Math.sin(angle(i)) * rad(d.difference); },
+        cy: function(d,i) { return Math.cos(angle(i)) * rad(d.difference); },
+        r: function(d, i) { return size(d.Avg_Registered_Voters); },
+        fill: function(d) { return color(d.Vote64); }
+      });
+
     dots.on("mouseover", function (d,i) {
       drawDetail(d,i, this);
     });
@@ -62,50 +71,56 @@
 
     dots.on("click", function(d) {
       d3.selectAll(".underline").remove();
-      shortenDetailLine();
       drawRadial(data, d);
     });
 
-    dots.transition()
-      .delay(function(d,i) { return i * 10;})
-      .attr({
-        cx: function(d,i) { return Math.sin(angle(i)) * rad(d.difference); },
-        cy: function(d,i) { return Math.cos(angle(i)) * rad(d.difference); },
-        r: function(d, i) { return size(d.Avg_Registered_Voters); },
-        fill: function(d) { return color(d.Vote64); }
-      });
-  }
+    
 
-function drawDetail(d,i, element) {
-  var detail = d3.select(".detail");
-  var selected = detail.selectAll("text").filter(function(inner_d) { return d == inner_d;});
-  var x = selected[0][0].getAttribute("x");
-  var y = selected[0][0].getAttribute("y");
-  var cx = element.getAttribute("cx");
-  var cy = element.getAttribute("cy");
-  var direction = i % 2 == 0 ? -1 : 1;
-  //var direction = function(d,i) { if (i % 2 === 0) { return -1;} else { return 1;}}
-  detail.append("path")
-    .classed("underline", true)
-    //.attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength())
-    .attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength())
-}
+    var drawDetail = function (d,i, element) {
+        var detail = d3.select(".detail");
+        var selected = detail.selectAll("text").filter(function(inner_d) { return d == inner_d;});
+        var x = selected[0][0].getAttribute("x");
+        var y = selected[0][0].getAttribute("y");
+        var cx = Math.sin(angle(i)) * rad(d.difference);
+        var cy = Math.cos(angle(i)) * rad(d.difference)
+        var direction = i % 2 == 0 ? -1 : 1;
+        //var direction = function(d,i) { if (i % 2 === 0) { return -1;} else { return 1;}}
+        detail.append("path")
+            .classed("underline", true)
+            //.attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength())
+            .attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength())
+    }
 
-function drawText(data) {
-  detail.selectAll(".label")
-    .data(data)
-    .enter()
-    .append("text")
-    .classed("label",true)
-    .classed("left",  function(d,i) { return i % 2 === 0 })
-    .classed("right", function(d,i) { return i % 2 !== 0 })
-    .attr(
-        {
-          x: labelX,
-          y: labelY
+    
+    function drawText(data) {
+      detail.selectAll(".label")
+        .data(data)
+        .enter()
+        .append("text")
+        .classed("label",true)
+        .classed("left",  function(d,i) { return i % 2 === 0 })
+        .classed("right", function(d,i) { return i % 2 !== 0 })
+        .attr(
+            {
+              x: labelX,
+              y: labelY
+            })
+      .text(function(d,i) { return d.County;})
+      .on("mouseover", function(d,i) {
+        drawDetail(d,i,this)
         })
-  .text(function(d,i) { return d.County;});
-}
+      .on("mouseout", function(d,i) {
+        d3.selectAll(".underline").remove();
+        })
+      .on("click", function(d) {
+        d3.selectAll(".underline").remove();
+        drawRadial(data, d);
+    });
+
+     }
+    //drawDetail is now in scope so we can call it
+    drawText(data);
+  }
 
 
 function labelX (d,i) { if (i % 2 === 0) { return -c2-10;} else { return c2+10;}}
@@ -146,7 +161,7 @@ d3.csv("data/amendment66_v2.csv", function(data66) {
                 console.log(d.Avg_Registered_Voters)
             }
             })})
-      drawText(data66);
+      //drawText(data66);
       drawRadial(data66, data66[0]);
     });
 });
