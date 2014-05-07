@@ -62,7 +62,7 @@ function drawRadial(data, selected) {
       });
 
     dots.on("mouseover", function (d,i) {
-      drawDetail(d,i, this);
+      drawDetail(d,i, this,rad);
     });
 
     dots.on("mouseout", function (d,i) {
@@ -76,11 +76,15 @@ function drawRadial(data, selected) {
 
     
 
-    var drawDetail = function (d,i, element) {
+    var drawDetail = function (d,i, element, rad) {
         var detail = d3.select(".detail");
+        console.log(rad.domain())
         var selected = detail.selectAll("text").filter(function(inner_d) { return d == inner_d;});
+        
+        //console.log(selected)
         var x = selected[0][0].getAttribute("x");
         var y = selected[0][0].getAttribute("y");
+        //console.log(d.difference)
         var cx = Math.sin(angle(i)) * rad(d.difference);
         var cy = Math.cos(angle(i)) * rad(d.difference)
         var direction = i % 2 == 0 ? -1 : 1;
@@ -92,8 +96,8 @@ function drawRadial(data, selected) {
     }
 
     
-    function drawText(data) {
-      detail.selectAll(".label")
+    function drawText(data,rad) {
+      var labels = d3.select(".detail").selectAll(".label")
         .data(data)
         .enter()
         .append("text")
@@ -105,9 +109,10 @@ function drawRadial(data, selected) {
               x: labelX,
               y: labelY
             })
-      .text(function(d,i) { return d.County;})
-      .on("mouseover", function(d,i) {
-        drawDetail(d,i,this)
+      .text(function(d,i) { return d.County;});
+      console.log("rad domain", rad.domain());
+      labels.on("mouseover", function(d,i) {
+        drawDetail(d,i,this,rad)
         })
       .on("mouseout", function(d,i) {
         d3.selectAll(".underline").remove();
@@ -119,7 +124,7 @@ function drawRadial(data, selected) {
 
      }
     //drawDetail is now in scope so we can call it
-    drawText(data);
+    drawText(data,rad);
   }
 
 
