@@ -22,9 +22,9 @@ function drawRadial(data, selected) {
     angle.rangePoints([0,2 * Math.PI]).domain(d3.range(data.length));
     rad.domain([0,max_diff])
       .range([0,circleWidth/2]);
-    size.domain(d3.extent(data,function (d) { return d.Avg_Registered_Voters}))
+    size.domain(d3.extent(data,function (d) { return d.Avg_Registered_Voters; }))
       .range([3,13]);
-    color.domain([0.45,0.5,0.55,1])
+    color.domain([0.45,0.5,0.55,1]);
     //color.domain(d3.extent(data,function (d) { return d.Vote64}))
     //   .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl); //consider: add multiple colors
  // Update header text.
@@ -74,36 +74,33 @@ function drawRadial(data, selected) {
       drawRadial(data, d);
     });
 
-    
-
     var drawDetail = function (d,i, element, rad) {
         var detail = d3.select(".detail");
-        console.log(rad.domain())
+        console.log(rad.domain());
         var selected = detail.selectAll("text").filter(function(inner_d) { return d == inner_d;});
-        
+
         //console.log(selected)
         var x = selected[0][0].getAttribute("x");
         var y = selected[0][0].getAttribute("y");
         //console.log(d.difference)
         var cx = Math.sin(angle(i)) * rad(d.difference);
-        var cy = Math.cos(angle(i)) * rad(d.difference)
-        var direction = i % 2 == 0 ? -1 : 1;
+        var cy = Math.cos(angle(i)) * rad(d.difference);
+        var direction = i % 2 === 0 ? -1 : 1;
         //var direction = function(d,i) { if (i % 2 === 0) { return -1;} else { return 1;}}
         detail.append("path")
             .classed("underline", true)
             //.attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength())
-            .attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength())
-    }
+            .attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength());
+    };
 
-    
     function drawText(data,rad) {
       var labels = d3.select(".detail").selectAll(".label")
-        .data(data)
-        .enter()
+        .data(data);
+      labels.enter()
         .append("text")
         .classed("label",true)
-        .classed("left",  function(d,i) { return i % 2 === 0 })
-        .classed("right", function(d,i) { return i % 2 !== 0 })
+        .classed("left",  function(d,i) { return i % 2 === 0; })
+        .classed("right", function(d,i) { return i % 2 !== 0; })
         .attr(
             {
               x: labelX,
@@ -112,7 +109,7 @@ function drawRadial(data, selected) {
       .text(function(d,i) { return d.County;});
       console.log("rad domain", rad.domain());
       labels.on("mouseover", function(d,i) {
-        drawDetail(d,i,this,rad)
+        drawDetail(d,i,this,rad);
         })
       .on("mouseout", function(d,i) {
         d3.selectAll(".underline").remove();
@@ -138,10 +135,10 @@ function shortenDetailLine() {
     .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210 L300,-210");
 }
 
-var x_offset=200
+var x_offset=200;
 var svg = d3.select("svg"),
       w = 960, h = 600, circleWidth = 600;
-var c2=circleWidth/2
+var c2=circleWidth/2;
 svg.attr({
   width:  w,
   height: h
@@ -157,16 +154,17 @@ detail.append("text").classed("detailHeader", true).attr({
 });
 
 d3.csv("data/amendment66_v2.csv", function(data66) {
-    d3.csv("data/amendment64_v2.csv", function(data64) {
-      data66.forEach( function(d){
-        data64.forEach( function(e) {
-            if (e.County == d.County) {
-                d.Vote64=e.Yes/e.Total
-                d.Avg_Registered_Voters=(d.Registered_Voters+e.Registered_Voters)/2
-                console.log(d.Avg_Registered_Voters)
-            }
-            })})
-      //drawText(data66);
-      drawRadial(data66, data66[0]);
+  d3.csv("data/amendment64_v2.csv", function(data64) {
+    data66.forEach( function(d){
+      data64.forEach( function(e) {
+        if (e.County == d.County) {
+          d.Vote64=e.Yes/e.Total;
+          d.Avg_Registered_Voters=(d.Registered_Voters+e.Registered_Voters)/2;
+          console.log(d.Avg_Registered_Voters);
+        }
+      });
     });
+    //drawText(data66);
+    drawRadial(data66, data66[0]);
+  });
 });
