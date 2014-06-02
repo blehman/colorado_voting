@@ -29,7 +29,7 @@ function drawRadial(data, selected) {
     //   .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl); //consider: add multiple colors
  // Update header text.
     d3.select("body").select('#vis').select("h3").text("Similarity to " + selected.County);
-
+    console.log(data)
     container.attr("transform", "translate(" + [circleWidth/2+x_offset,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
       .enter()
@@ -63,7 +63,7 @@ function drawRadial(data, selected) {
 
     dots.on("mouseover", function (d,i) {
       drawDetail(d,i, this,rad);
-      updateCallout(d,d3.select(".callout .right"));
+      updateCallout(d,d3.select(".callout .righty"));
     });
 
     dots.on("mouseout", function (d,i) {
@@ -72,15 +72,27 @@ function drawRadial(data, selected) {
 
     dots.on("click", function(d) {
       d3.selectAll(".underline").remove();
-      updateCallout(d,d3.select(".callout .left"));
+      updateCallout(d,d3.select(".callout .lefty"));
       drawRadial(data, d);
     });
 
     var updateCallout = function(d, element) {
+      var format = d3.format("%.3p");
       element.select(".heading").text(d.County);
+      element.select(".table1").text(format(d.Vote64))
+      element.select(".table2").text(format(d.Vote66))
+      element.select(".table3").text(format(d.Turnout))
+      element.select(".table4").text(Math.round(d.Avg_Registered_Voters))
+
+
+      
+      
+
+
+
     };
 
-    updateCallout(selected, d3.select(".callout .left"));
+    updateCallout(selected, d3.select(".callout .lefty"));
 
     var drawDetail = function (d,i, element, rad) {
         var detail = d3.select(".detail");
@@ -114,7 +126,7 @@ function drawRadial(data, selected) {
       .text(function(d,i) { return d.County;});
       labels.on("mouseover", function(d,i) {
         drawDetail(d,i,this,rad);
-        updateCallout(d,d3.select(".callout .right"));
+        updateCallout(d,d3.select(".callout .righty"));
         })
       .on("mouseout", function(d,i) {
         d3.selectAll(".underline").remove();
@@ -122,7 +134,7 @@ function drawRadial(data, selected) {
       .on("click", function(d) {
         d3.selectAll(".underline").remove();
         drawRadial(data, d);
-        updateCallout(d,d3.select(".callout .left"));
+        updateCallout(d,d3.select(".callout .lefty"));
     });
 
      }
@@ -142,8 +154,11 @@ function shortenDetailLine() {
 }
 
 function setupCallout(elem) {
-  elem.append("text").classed("heading", true).attr("transform", "translate(200,0)");
-  elem.append("text").classed("table", true);
+  elem.append("text").classed("heading", true).attr("transform", "translate(0,0)");
+  elem.append("text").classed("table1", true).attr("transform","translate(0,20)");
+  elem.append("text").classed("table2", true).attr("transform","translate(0,40)");
+  elem.append("text").classed("table3", true).attr("transform","translate(0,60)");
+  elem.append("text").classed("table4", true).attr("transform","translate(0,80)");
 }
 
 var x_offset=200;
@@ -167,9 +182,15 @@ detail.append("text").classed("detailHeader", true).attr({
 
 var callout = svg.append("g").classed("callout", true);
 callout.attr("transform", "translate(0,620)");
-var left = callout.append("g").classed("left", true);
-var right = callout.append("g").classed("right", true).attr("transform", "translate(480,0)");
+var left = callout.append("g").classed("lefty", true).attr("transform","translate(320,0)");
+var right = callout.append("g").classed("righty", true).attr("transform", "translate(590,0)");
 setupCallout(left); setupCallout(right);
+var tabel_offset=193;
+var row_labels = callout.append("g").classed("row_labels", true);
+row_labels.append("text").text("Pot:").attr("transform", "translate("+tabel_offset+",20)")
+row_labels.append("text").text("Edu:").attr("transform", "translate("+tabel_offset+",40)")
+row_labels.append("text").text("Turnout:").attr("transform", "translate("+tabel_offset+",60)")
+row_labels.append("text").text("Reg Voters (avg):").attr("transform", "translate("+tabel_offset+",80)")
 
 d3.csv("data/amendment66_v2.csv", function(data66) {
   d3.csv("data/amendment64_v2.csv", function(data64) {
@@ -177,7 +198,11 @@ d3.csv("data/amendment66_v2.csv", function(data66) {
       data64.forEach( function(e) {
         if (e.County == d.County) {
           d.Vote64=e.Yes/e.Total;
+          d.Vote66=+d.Yes/+d.Total;
+          d.Registered_Voters = +d.Registered_Voters;
+          e.Registered_Voters = +e.Registered_Voters;
           d.Avg_Registered_Voters=(d.Registered_Voters+e.Registered_Voters)/2;
+          console.log(d,e)
         }
       });
     });
