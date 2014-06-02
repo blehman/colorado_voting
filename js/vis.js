@@ -28,7 +28,8 @@ function drawRadial(data, selected) {
     //color.domain(d3.extent(data,function (d) { return d.Vote64}))
     //   .range(["#8DF2C8","#213D32"]).interpolate(d3.interpolateHsl); //consider: add multiple colors
  // Update header text.
-    d3.select("body").select('#vis').select("h3").text("Similarity to " + selected.County);
+    d3.select("body").select('#vis').select("h3").text("nearness to center is similarity to " + selected.County+ " county on ammendment 66");
+    //.style("margin-left","190px");
     console.log(data)
     container.attr("transform", "translate(" + [circleWidth/2+x_offset,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
