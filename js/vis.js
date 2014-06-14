@@ -30,7 +30,6 @@ function drawRadial(data, selected) {
  // Update header text.
     d3.select("body").select('#vis').select("h3").text("nearness to center is similarity to " + selected.County+ " county on ammendment 66");
     //.style("margin-left","190px");
-    console.log(data)
     container.attr("transform", "translate(" + [circleWidth/2+x_offset,circleWidth/2] + ")");
     markers.selectAll(".marker").data(d3.range(4))
       .enter()
@@ -41,6 +40,22 @@ function drawRadial(data, selected) {
         cy: 0,
         r: function(d,i) { return (i+1) * circleWidth / 8; }
       });
+    var marker_labels = markers.selectAll(".marker-label");
+    marker_labels.data(d3.range(4))
+      .enter()
+      .append("text")
+      .classed("marker-label", true)
+      .attr({
+        x: function(d,i) { return ((i+1) * circleWidth / 8);},
+        y: 0
+      });
+
+    marker_labels.text(function(d,i) {
+        var spread = rad.domain()[1] - rad.domain()[0];
+        return d3.format(".2f")(rad.domain()[0] + (spread * i / 4));
+      });
+
+    console.log(rad.domain(), rad.range());
 
     dots = dot_selection.data(data, function(d) { return d.County; }); //makes d3 use county instead of index to differentiate items in the array
 
@@ -68,11 +83,11 @@ function drawRadial(data, selected) {
     });
 
     dots.on("mouseout", function (d,i) {
-      d3.selectAll(".underline").remove();
+//      d3.selectAll(".underline").remove();
     });
 
     dots.on("click", function(d) {
-      d3.selectAll(".underline").remove();
+      d3.selectAll(".underline").attr("d", "");
       updateCallout(d,d3.select(".callout .lefty"));
       drawRadial(data, d);
     });
@@ -80,17 +95,10 @@ function drawRadial(data, selected) {
     var updateCallout = function(d, element) {
       var format = d3.format("%.3p");
       element.select(".heading").text(d.County);
-      element.select(".table1").text(format(d.Vote64))
-      element.select(".table2").text(format(d.Vote66))
-      element.select(".table3").text(format(d.Turnout))
-      element.select(".table4").text(Math.round(d.Avg_Registered_Voters))
-
-
-      
-      
-
-
-
+      element.select(".table1").text(format(d.Vote64));
+      element.select(".table2").text(format(d.Vote66));
+      element.select(".table3").text(format(d.Turnout));
+      element.select(".table4").text(Math.round(d.Avg_Registered_Voters));
     };
 
     updateCallout(selected, d3.select(".callout .lefty"));
@@ -105,10 +113,8 @@ function drawRadial(data, selected) {
         var cy = Math.cos(angle(i)) * rad(d.difference);
         var direction = i % 2 === 0 ? -1 : 1;
         //var direction = function(d,i) { if (i % 2 === 0) { return -1;} else { return 1;}}
-        detail.append("path")
-            .classed("underline", true)
             //.attr("d", "M" + x + "," + y + "h" + selected[0][0].getComputedTextLength())
-            .attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength());
+        d3.select(".underline").transition().attr("d", "M" + cx+","+cy+" L"+x+","+y+"h"+direction*selected[0][0].getComputedTextLength());
     };
 
     function drawText(data,rad) {
@@ -130,10 +136,10 @@ function drawRadial(data, selected) {
         updateCallout(d,d3.select(".callout .righty"));
         })
       .on("mouseout", function(d,i) {
-        d3.selectAll(".underline").remove();
+//        d3.selectAll(".underline")
         })
       .on("click", function(d) {
-        d3.selectAll(".underline").remove();
+        d3.selectAll(".underline").attr("d", "");
         drawRadial(data, d);
         updateCallout(d,d3.select(".callout .lefty"));
     });
@@ -151,6 +157,7 @@ function shortenDetailLine() {
   var line   = detail.select(".detailLine");
   var header = detail.select(".detailHeader");
   d3.select(".detailLine").transition()
+    .duration(100)
     .attr("d", "M"+(300 + header[0][0].getComputedTextLength()) + ",-210 L300,-210 L300,-210");
 }
 
@@ -179,6 +186,7 @@ detail.append("text").classed("detailHeader", true).attr({
   x: 300,
   y: -220,
 });
+detail.append("path").classed("underline", true);
 
 
 var callout = svg.append("g").classed("callout", true);
@@ -188,10 +196,10 @@ var right = callout.append("g").classed("righty", true).attr("transform", "trans
 setupCallout(left); setupCallout(right);
 var tabel_offset=193;
 var row_labels = callout.append("g").classed("row_labels", true);
-row_labels.append("text").text("Pot:").attr("transform", "translate("+tabel_offset+",20)")
-row_labels.append("text").text("Edu:").attr("transform", "translate("+tabel_offset+",40)")
-row_labels.append("text").text("Turnout:").attr("transform", "translate("+tabel_offset+",60)")
-row_labels.append("text").text("Reg Voters (avg):").attr("transform", "translate("+tabel_offset+",80)")
+row_labels.append("text").text("Pot:").attr("transform", "translate("+tabel_offset+",20)");
+row_labels.append("text").text("Edu:").attr("transform", "translate("+tabel_offset+",40)");
+row_labels.append("text").text("Turnout:").attr("transform", "translate("+tabel_offset+",60)");
+row_labels.append("text").text("Reg Voters (avg):").attr("transform", "translate("+tabel_offset+",80)");
 
 d3.csv("data/amendment66_v2.csv", function(data66) {
   d3.csv("data/amendment64_v2.csv", function(data64) {
@@ -203,7 +211,6 @@ d3.csv("data/amendment66_v2.csv", function(data66) {
           d.Registered_Voters = +d.Registered_Voters;
           e.Registered_Voters = +e.Registered_Voters;
           d.Avg_Registered_Voters=(d.Registered_Voters+e.Registered_Voters)/2;
-          console.log(d,e)
         }
       });
     });

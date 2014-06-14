@@ -50,3 +50,10 @@ svg {
   fill: #666;
   stroke: #666;
 }
+
+.marker-label {
+  text-anchor: end;
+  font-size: 10px;
+  font-weight: 40;
+  opacity: 0.5;
+}
